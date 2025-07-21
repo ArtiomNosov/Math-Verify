@@ -22,6 +22,7 @@
 
 import logging
 import os
+from typing import Optional
 
 from math_verify.errors import TimeoutException
 
@@ -29,7 +30,7 @@ TIMEOUT_WARNING_SHOWN = False
 logger = logging.getLogger(__name__)
 
 
-def timeout(timeout_seconds: int | None = 10):  # noqa: C901
+def timeout(timeout_seconds: Optional[int] = 10):  # noqa: C901
     """A decorator that applies a timeout to the decorated function.
 
     Args:
