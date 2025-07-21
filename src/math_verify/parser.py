@@ -25,7 +25,7 @@ import re
 from dataclasses import dataclass, field, replace
 from functools import lru_cache
 from itertools import groupby
-from typing import Literal, Sequence
+from typing import Literal, Sequence, Tuple, Union
 
 import sympy
 from latex2sympy2_extended.latex2sympy2 import (
@@ -105,7 +105,7 @@ class StringExtractionConfig:
     lowercase: bool = True
 
 
-ExtractionTarget = LatexExtractionConfig | ExprExtractionConfig | StringExtractionConfig
+ExtractionTarget = Union[LatexExtractionConfig, ExprExtractionConfig, StringExtractionConfig]
 
 
 @lru_cache(maxsize=10)
@@ -405,7 +405,7 @@ def parse_expr_cached(expr: str):
     return parse_expr(expr, evaluate=False)
 
 
-def extract_expr(match: re.Match) -> tuple[str | sympy.Expr | None, str]:
+def extract_expr(match: re.Match) -> Tuple[Union[str, sympy.Expr, None], str]:
     # First combine the number
     groups = match.groupdict()
     # Expr group will always exist because every regex has it
@@ -466,7 +466,7 @@ def get_last_eq(latex: str):
 @lru_cache(maxsize=20)
 def extract_latex(
     match: re.Match, latex_config: LatexExtractionConfig
-) -> tuple[sympy.Expr | str | None, str]:
+) -> Tuple[Union[sympy.Expr, str, None], str]:
     latex_exprs = []
     latex_strs = []
 
@@ -552,7 +552,7 @@ def extract_string(match: re.Match, string_config: StringExtractionConfig):
 
 def extract_match(
     match: re.Match, target_type: ExtractionTarget
-) -> tuple[Basic | MatrixBase | str | None, str]:
+) -> Tuple[Union[Basic, MatrixBase, str, None], str]:
     """Extracts the match from the regex match.
 
     Args:

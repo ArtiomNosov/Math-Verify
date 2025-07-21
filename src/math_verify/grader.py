@@ -26,6 +26,7 @@ import re
 from itertools import product
 
 from latex2sympy2_extended import is_expr_of_only_symbols
+from typing import List, Optional, Tuple as TypingTuple, Union
 from latex2sympy2_extended.logic import And
 from latex2sympy2_extended.sets import FiniteSet
 from sympy import (
@@ -74,7 +75,7 @@ INVERSE_RELATIONS = {
 }
 
 
-def safe_sympy_doit(a: Basic | MatrixBase):
+def safe_sympy_doit(a: Union[Basic, MatrixBase]):
     """Safely execute doit() on a sympy expression, catching exceptions.
       Doit in sympy will evaluate expressions it will pass the expression tree and evluate nodes.
       For example for 1+1+1 it will evaluate the additions and return 3. One issue with it is that it maybe
@@ -94,7 +95,7 @@ def safe_sympy_doit(a: Basic | MatrixBase):
     return a
 
 
-def is_atomic_or_pct_atomic(expr: Basic | MatrixBase, atomic_type: type) -> bool:
+def is_atomic_or_pct_atomic(expr: Union[Basic, MatrixBase], atomic_type: type) -> bool:
     """Check if expression is either an atomic type or percentage atomic type.
 
     Args:
@@ -115,8 +116,8 @@ def is_atomic_or_pct_atomic(expr: Basic | MatrixBase, atomic_type: type) -> bool
 
 
 def sympy_numeric_eq(
-    a: Basic | MatrixBase,
-    b: Basic | MatrixBase,
+    a: Union[Basic, MatrixBase],
+    b: Union[Basic, MatrixBase],
     float_rounding: int,
     numeric_precision: int,
 ):
@@ -171,7 +172,7 @@ def sympy_numeric_eq(
     return False
 
 
-def sympy_symbolic_eq(a: Basic | MatrixBase, b: Basic | MatrixBase) -> bool:
+def sympy_symbolic_eq(a: Union[Basic, MatrixBase], b: Union[Basic, MatrixBase]) -> bool:
     """Compare two sympy expressions symbolically.
 
     Args:
@@ -205,8 +206,8 @@ def sort_key(x):
         return default_sort_key(unwrap_eq(x))
 
 def sympy_deep_compare_set_and_tuple(
-    gold: SympyFiniteSet | Tuple,
-    pred: SympyFiniteSet | Tuple,
+    gold: Union[SympyFiniteSet, TypingTuple],
+    pred: Union[SympyFiniteSet, TypingTuple],
     float_rounding: int,
     numeric_precision: int,
 ) -> bool:
@@ -295,8 +296,8 @@ def sympy_solve_and_compare(
 
 
 def sympy_compare_relational(
-    gold: Relational | And,
-    pred: Relational | And,
+    gold: Union[Relational, And],
+    pred: Union[Relational, And],
     float_rounding: int,
     numeric_precision: int,
 ) -> bool:
@@ -354,7 +355,7 @@ def sympy_compare_relational(
     return False
 
 
-def sympy_str_eq(a: Basic | MatrixBase, b: Basic | MatrixBase) -> bool:
+def sympy_str_eq(a: Union[Basic, MatrixBase], b: Union[Basic, MatrixBase]) -> bool:
     """Compare two sympy expressions by string representation.
 
     Args:
@@ -375,8 +376,8 @@ def sympy_str_eq(a: Basic | MatrixBase, b: Basic | MatrixBase) -> bool:
 
 
 def sympy_compare_sets(
-    gold: Set | Basic | MatrixBase | Tuple,
-    pred: Set | Basic | MatrixBase | Tuple,
+    gold: Union[Set, Basic, MatrixBase, TypingTuple],
+    pred: Union[Set, Basic, MatrixBase, TypingTuple],
     float_rounding: int,
     numeric_precision: int,
 ) -> bool:
@@ -438,7 +439,7 @@ def sympy_compare_sets(
     return False
 
 
-def sympy_compare_symbols(gold: Basic | MatrixBase, pred: Basic | MatrixBase) -> bool:
+def sympy_compare_symbols(gold: Union[Basic, MatrixBase], pred: Union[Basic, MatrixBase]) -> bool:
     """Compare two sympy expressions where at least one is a Symbol.
 
     Handles special cases:
@@ -494,7 +495,7 @@ def sympy_compare_symbols(gold: Basic | MatrixBase, pred: Basic | MatrixBase) ->
     return str(gold) == str(pred)
 
 
-def is_relation(expr: Basic | MatrixBase) -> bool:
+def is_relation(expr: Union[Basic, MatrixBase]) -> bool:
     """Check if an expression is a relational expression.
 
     Args:
@@ -511,7 +512,7 @@ def is_relation(expr: Basic | MatrixBase) -> bool:
     return False
 
 
-def is_equation(expr: Basic | MatrixBase) -> bool:
+def is_equation(expr: Union[Basic, MatrixBase]) -> bool:
     """Check if an expression is an equation.
 
     Args:
@@ -528,7 +529,7 @@ def is_equation(expr: Basic | MatrixBase) -> bool:
     return False
 
 
-def is_assignment_relation(expr: Basic | MatrixBase) -> bool:
+def is_assignment_relation(expr: Union[Basic, MatrixBase]) -> bool:
     """Check if an expression is an assignment relation. E.g a=1
 
     Args:
@@ -547,21 +548,21 @@ def is_assignment_relation(expr: Basic | MatrixBase) -> bool:
     return False
 
 
-def take_last_relation(expr: And | Relational) -> Relational:
+def take_last_relation(expr: Union[And, Relational]) -> Relational:
     """Take the last relation from an And expression."""
     if isinstance(expr, And):
         return take_last_relation(expr._unsorted_args[-1])
     return expr
 
 
-def take_first_relation(expr: And | Relational) -> Relational:
+def take_first_relation(expr: Union[And, Relational]) -> Relational:
     """Take the first relation from an And expression."""
     if isinstance(expr, And):
         return expr._unsorted_args[0]
     return expr
 
 
-def unwrap_fcs(expr: Basic | MatrixBase) -> Basic | MatrixBase:
+def unwrap_fcs(expr: Union[Basic, MatrixBase]) -> Union[Basic, MatrixBase]:
     """Unwrap function calls to their arguments.
 
     For example, Function('f')(x) becomes Symbol('f_x')
@@ -597,8 +598,8 @@ def unwrap_fcs(expr: Basic | MatrixBase) -> Basic | MatrixBase:
 
 
 def sympy_expr_eq(
-    gold: Basic | MatrixBase,
-    pred: Basic | MatrixBase,
+    gold: Union[Basic, MatrixBase],
+    pred: Union[Basic, MatrixBase],
     float_rounding: int,
     numeric_precision: int,
     allow_set_relation_comp: bool = False,
@@ -741,13 +742,13 @@ def should_treat_as_complex(latex_str: str) -> bool:
 
 
 def verify(
-    gold: list[Basic | MatrixBase | str] | Basic | MatrixBase | str,
-    target: list[Basic | MatrixBase | str] | Basic | MatrixBase | str,
+    gold: Union[List[Union[Basic, MatrixBase, str]], Basic, MatrixBase, str],
+    target: Union[List[Union[Basic, MatrixBase, str]], Basic, MatrixBase, str],
     float_rounding: int = 6,
     numeric_precision: int = 15,
     strict: bool = True,
     allow_set_relation_comp: bool = False,
-    timeout_seconds: int | None = 5,
+    timeout_seconds: Optional[int] = 5,
     raise_on_error: bool = False,
 ) -> bool:
     """Verifies if the target expression matches the gold expression using multiple comparison strategies.
@@ -813,7 +814,7 @@ def verify(
 
     @timeout(timeout_seconds=timeout_seconds)
     def compare_single_extraction(
-        gold: Basic | MatrixBase | str, target: Basic | MatrixBase | str
+        gold: Union[Basic, MatrixBase, str], target: Union[Basic, MatrixBase, str]
     ) -> bool:
         # If both are sympy expressions, we can use sympy to compare them
         if isinstance(gold, (Basic, MatrixBase)) and isinstance(
